@@ -1,6 +1,6 @@
-package org.gamebackend.repository;
+package org.gamebackend.login.repository;
 
-import org.gamebackend.model.UserModel;
+import org.gamebackend.login.model.UserModel;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;

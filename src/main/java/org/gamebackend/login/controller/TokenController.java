@@ -1,13 +1,13 @@
-package org.gamebackend.controller;
+package org.gamebackend.login.controller;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gamebackend.model.TokenModel;
-import org.gamebackend.model.UserModel;
-import org.gamebackend.service.TokenService;
+import org.gamebackend.login.model.TokenModel;
+import org.gamebackend.login.model.UserModel;
+import org.gamebackend.login.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

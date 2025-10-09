@@ -1,6 +1,6 @@
-package org.gamebackend.repository;
+package org.gamebackend.login.repository;
 
-import org.gamebackend.model.TokenModel;
+import org.gamebackend.login.model.TokenModel;
 
 import java.time.LocalDateTime;
 import java.util.List;

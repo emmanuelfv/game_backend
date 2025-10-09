@@ -1,4 +1,4 @@
-package org.gamebackend.model;
+package org.gamebackend.login.model;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;

@@ -1,8 +1,8 @@
-package org.gamebackend.controller;
+package org.gamebackend.login.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gamebackend.model.UserModel;
-import org.gamebackend.service.UserService;
+import org.gamebackend.login.model.UserModel;
+import org.gamebackend.login.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

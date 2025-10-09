@@ -1,7 +1,7 @@
-package org.gamebackend.service;
+package org.gamebackend.login.service;
 
-import org.gamebackend.model.UserModel;
-import org.gamebackend.repository.UserRepository;
+import org.gamebackend.login.model.UserModel;
+import org.gamebackend.login.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

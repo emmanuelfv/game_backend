@@ -1,7 +1,6 @@
-package org.gamebackend.repository;
+package org.gamebackend.login.repository;
 
-import org.gamebackend.model.TokenModel;
-import org.gamebackend.model.UserModel;
+import org.gamebackend.login.model.UserModel;
 
 import java.util.List;
 import java.util.Optional;
