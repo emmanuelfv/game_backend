@@ -20,12 +20,12 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/")
+    /*@GetMapping("/")
     public String welcome(){
         log.info("In Rest /");
         log.info("welcome");
         return "welcome";
-    }
+    }*/
 
     @PostMapping("create_user")
     public ResponseEntity<String> createUser(@RequestHeader Map<String,String> user_creation_data){
