@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import jakarta.xml.bind.DatatypeConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Entity(name="auth_token")
@@ -47,10 +48,7 @@ public class TokenModel {
         }
     }
 
-    public void setToken(String token) throws Exception{
-        if(token == null){
-            throw new IllegalArgumentException("token is not defined");
-        }
+    public void setToken(@NonNull String token) throws Exception{
         this.token = token;
     }
 }

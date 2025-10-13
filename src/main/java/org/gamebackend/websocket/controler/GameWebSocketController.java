@@ -1,10 +1,12 @@
 package org.gamebackend.websocket.controler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gamebackend.connect4.service.Connect4Service;
 import org.gamebackend.login.model.UserModel;
-import org.gamebackend.websocket.model.GameMove;
+import org.gamebackend.login.service.TokenService;
+import org.gamebackend.websocket.model.GameLogin;
 import org.gamebackend.websocket.model.GameStatus;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -19,14 +21,33 @@ public class GameWebSocketController {
     // broker: game_backend , destination_prefix: connect4, endpoint: ws_game, mapping: move, sendTo: game_backend/move
     // publish destination /connect4/move, brokerurl url/ws_game, client subscribe to /game_backend/move
 
-    /*
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private Connect4Service connect4Service;
+
+
     @MessageMapping("/join")
     @SendTo("/game_backend/join")
-    public GameStatus handleJoin(UserModel player) {
-        log.info("in handleMove player: {}", player);
+    public GameLogin handleJoin(GameLogin login) {
+        log.info("in handleMove login: {}", login);
+        String validation = tokenService.validateToken(login.getToken());
+        if(!validation.equals("validated")) {
+            login.setErrorMessage(validation);
+            return login;
+        }
 
-        return new GameStatus("Jugador conectado: " + player.getName());
-    }*/
+        String creationStatus = connect4Service.findOrCreateGame(login.getUserName());
+        login.setGameId(creationStatus.substring(4,8));
+        if(creationStatus.startsWith("new")){
+            login.setPlayerId("p1");
+        } else {
+            login.setPlayerId("p2");
+        }
+
+        return login;
+    }
     /*
     @MessageMapping("/move")
     @SendTo("/game_backend/{gameId}")

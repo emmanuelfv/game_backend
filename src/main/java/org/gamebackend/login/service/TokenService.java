@@ -1,5 +1,7 @@
 package org.gamebackend.login.service;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.gamebackend.login.model.TokenModel;
 import org.gamebackend.login.model.UserModel;
 import org.gamebackend.login.repository.TokenRepository;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TokenService {
     @Autowired
     TokenRepository tokenRepository;
@@ -27,40 +30,45 @@ public class TokenService {
         return tokenRepository.findByToken(token);
     }
 
-    public String provideToken(UserModel user){
+    public String provideToken(UserModel user) throws Exception{
         Optional<UserModel> userFound = userRepository.findByNameAndPassword(user.getName(), user.getPassword());
-        if (userFound.isPresent() ){
-            UserModel userToSave = userFound.get();
-            TokenModel token = new TokenModel();
-            try {
-                token.setToken(userToSave.getLastToken());
-            } catch (Exception e) {
-                token.setToken();
-            }
-            LocalDateTime time = LocalDateTime.now();
-            token.setCreationdate(time);
-            token.setUpdatedate(time.minusMinutes(expirationMinutes));
-            String validateResult = this.validateToken(token);
-
-            if (validateResult.equals("validated")) {
-                Optional<TokenModel> tokenWrapper = tokenRepository.findByToken(token.getToken());
-                token = tokenWrapper.get();
-            } else if (validateResult.equals("expired")) {
-                token.setToken();
-            }
-            token.setUpdatedate(time);
-            tokenRepository.save(token);
-            userToSave.setLastToken(token.getToken());
-            userRepository.save(userToSave);
-            return token.getToken();
-        }
-        else {
+        if (userFound.isEmpty() ){
             return "invalid";
         }
+
+        UserModel userToSave = userFound.get();
+        String validateResult = this.validateToken(userToSave.getLastToken());
+
+        TokenModel token = new TokenModel();
+        if (validateResult.equals("validated")) {
+            Optional<TokenModel> tokenWrapper = tokenRepository.findByToken(userToSave.getLastToken());
+            token = tokenWrapper.get();
+        } else if (validateResult.equals("expired")) {
+            LocalDateTime time = LocalDateTime.now();
+            token.setToken();
+            token.setCreationdate(time);
+            token.setUpdatedate(time);
+            tokenRepository.save(token);
+        }
+        userToSave.setLastToken(token.getToken());
+        userRepository.save(userToSave);
+        return token.getToken();
     }
 
-    public String validateToken(TokenModel token){
-        Optional<TokenModel> tokenFound = tokenRepository.findByTokenAndUpdatedateGreaterThan(token.getToken(), token.getUpdatedate());
+    @SneakyThrows
+    public String validateToken(String token_str){
+        TokenModel token = new TokenModel();
+        LocalDateTime time = LocalDateTime.now();
+        log.info("time:\n{}", time);
+        log.info("System expiration time [minutes]:\n{}", expirationMinutes);
+        token.setToken(token_str);
+        token.setCreationdate(time);
+        token.setUpdatedate(time.minusMinutes(expirationMinutes));
+        Optional<TokenModel> tokenFound = tokenRepository
+                .findByTokenAndUpdatedateGreaterThan(
+                        token.getToken(),
+                        token.getUpdatedate().minusMinutes(expirationMinutes)
+                );
         if(tokenFound.isPresent()){
             return "validated";
         } else {

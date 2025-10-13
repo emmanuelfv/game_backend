@@ -22,10 +22,16 @@ public class TokenRepositoryImpl implements TokenRepository {
 
     @Override
     public Optional<TokenModel> findByTokenAndUpdatedateGreaterThan(String token, LocalDateTime updatedate) {
-        return tokens.stream()
+        Optional<TokenModel> tokenFound = tokens.stream()
                 .filter(t -> t.getToken().equals(token) &&
                         t.getUpdatedate().isAfter(updatedate))
                 .findFirst();
+
+        if (tokenFound.isPresent()) {
+            tokenFound.get().setUpdatedate(LocalDateTime.now());
+        }
+
+        return tokenFound;
     }
 
     @Override

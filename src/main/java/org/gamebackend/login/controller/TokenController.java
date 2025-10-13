@@ -32,7 +32,8 @@ public class TokenController {
     private int expirationMinutes;
 
     @PostMapping("login")
-    public ResponseEntity<Map<String,String>> login(@RequestHeader Map<String,String> user_login_data){
+    public ResponseEntity<Map<String,String>> login(
+            @RequestHeader Map<String,String> user_login_data) throws Exception{
         log.info("In Rest login");
         log.info("input header:\n{}", user_login_data);
         UserModel userToCreate = new UserModel();
@@ -62,29 +63,18 @@ public class TokenController {
     public ResponseEntity<String> validateToken(@RequestHeader Map<String,String> token_data){
         log.info("In Rest login");
         log.info("input header:\n{}", token_data);
-        TokenModel tokenToValidate = new TokenModel();
-        LocalDateTime time = LocalDateTime.now();
-        log.info("time:\n{}", time);
-        log.info("System expiration time [minutes]:\n{}", expirationMinutes);
         try {
-            tokenToValidate.setToken(token_data.get("token"));
+            String creationResponse = tokenService.validateToken(token_data.get("token"));
+            HttpStatusCode status = creationResponse.equals("validated") ?
+                HttpStatus.OK : HttpStatus.BAD_REQUEST;
+
+            log.info("creationResponse: {}", creationResponse);
+            log.info("http status: {}", status);
+            return new ResponseEntity<String>(creationResponse, status);
         } catch (Exception e) {
             log.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        tokenToValidate.setCreationdate(time);
-        tokenToValidate.setUpdatedate(time.minusMinutes(expirationMinutes));
-        String creationResponse = tokenService.validateToken(tokenToValidate);
-        HttpStatusCode status;
-        if(creationResponse.equals("validated")){
-            status = HttpStatus.OK;
-        }
-        else {
-            status = HttpStatus.BAD_REQUEST;
-        }
-        log.info("creationResponse: {}", creationResponse);
-        log.info("http status: {}", status);
-        return new ResponseEntity<String>(creationResponse, status);
     }
 
     @GetMapping("show_all_tokens")
