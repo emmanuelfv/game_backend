@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameStatus {
-    private String message;
+public class GameState {
+    private String gameId;
+    private char turn;
+    private char[][] board;
+    private char endGame;
 }
