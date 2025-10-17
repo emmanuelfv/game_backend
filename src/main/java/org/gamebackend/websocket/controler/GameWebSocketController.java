@@ -17,7 +17,7 @@ import java.util.List;
 @Controller
 public class GameWebSocketController {
     // broker: game_backend , destination_prefix: connect4, endpoint: ws_game, mapping: move, sendTo: game_backend/move
-    // publish destination /connect4/move, brokerurl url/ws_game, client subscribe to /game_backend/move
+    // publish destination /connect4/move, brokerUrl url/ws_game, client subscribe to /game_backend/move
 
     @Autowired
     private TokenService tokenService;
@@ -30,12 +30,12 @@ public class GameWebSocketController {
     @SendTo("/game_backend/join")
     public GameLogin handleJoin(GameLogin login) {
         log.info("in handleMove login: {}", login);
-        String validation = tokenService.validateToken(login.getToken());
+        String validation = tokenService.validateToken(login.getPlayerId());
         if(!validation.equals("validated")) {
             login.setErrorMessage(validation);
             return login;
         }
-        List<String> creationStatus = connect4Service.findOrCreateGame(login.getUserName());
+        List<String> creationStatus = connect4Service.findOrCreateGame(login.getPlayerId());
         login.setGameId(creationStatus.get(0));
         login.setPlayerId(creationStatus.get(1));
         return login;
@@ -53,7 +53,7 @@ public class GameWebSocketController {
     @MessageMapping("/move")
     @SendTo("/game_backend/move")
     public GameState handleMove(GameState gameStatus) {
-        log.info("in handleMove gameStauts: {}", gameStatus);
+        log.info("in handleMove gameStatus: {}", gameStatus);
         return new GameState(gameStatus.getMessage() + "+1");
     }*/
 }

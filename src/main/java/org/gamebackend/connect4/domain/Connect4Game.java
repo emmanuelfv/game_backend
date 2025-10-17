@@ -5,6 +5,9 @@ import org.gamebackend.websocket.model.GameState;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Connect4Game {
     private static final int ROWS = 6;
@@ -20,53 +23,60 @@ public class Connect4Game {
     private String player2;
 
     private char[][] board;
-    private boolean turn;
+    private char turn;
     private Character endGame;
     private int[] upperBound;
 
-    public Connect4Game(String player1, int gameInt) {
-        this.player1 = player1;
+    private char getPlayerTurn(String playerId) {
+        if (playerId.equals("p1")) return 'x';
+        else if (playerId.equals("p2")) return 'o';
+        return EMPTY_SLOT;
+    }
+
+    public Connect4Game(String playerToken1, int gameInt) {
+        this.player1 = playerToken1;
         this.gameId = "connect4_" + new DecimalFormat("0000").format(gameInt);
         this.endGame = EMPTY_SLOT;
     }
 
-    public void setPlayer2(String player2) {
-        this.player2 = player2;
+    public void setPlayer2(String playerToken2) {
+        this.player2 = playerToken2;
         this.matchStart();
     }
 
-    public GameState playMove(int column, String player){
+    public GameState playMove(int column, String playerId){
         if (endGame != null  ||
                 player2 == null ||
+                turn != getPlayerTurn(playerId) ||
                 this.upperBound[column] == 0 ||
                 column >= COLS ) {
             return getGameState();
         }
         int row = this.upperBound[column];
-        this.board[row][column] = turn ? 'o' : 'x';
+        this.board[row][column] = turn;
         this.upperBound[column]--;
-        turn = !turn;
-        endGame = checkEndGame(turn ? 'o' : 'x');
+        turn = turn == 'x' ? 'o' : 'x';
+        endGame = checkEndGame(turn);
         return getGameState();
     }
 
-    private GameState getGameState() {
+    public GameState getGameState() {
         GameState gameState = new GameState();
         gameState.setGameId(this.gameId);
         gameState.setBoard(this.board);
-        gameState.setTurn(this.turn ? 'o' : 'x');
+        gameState.setTurn(this.turn);
         gameState.setEndGame(this.endGame);
         return gameState;
     }
 
     private void matchStart() {
-        this.upperBound = new int[COLS-1];
+        this.upperBound = new int[COLS];
+        Arrays.fill(this.upperBound, COLS-1);
         this.board = new char[ROWS][COLS];
         for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
-                this.board[i][j] = EMPTY_SLOT;
-            }
+            Arrays.fill(this.board[i], EMPTY_SLOT);
         }
+        this.turn = new Random().nextBoolean() ? 'x' : 'o';
     }
 
     private char checkEndGame(char turn){

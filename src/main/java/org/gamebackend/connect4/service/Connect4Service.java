@@ -3,6 +3,8 @@ package org.gamebackend.connect4.service;
 import org.gamebackend.connect4.domain.Connect4Game;
 import org.gamebackend.websocket.model.GameMove;
 import org.gamebackend.websocket.model.GameState;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,17 +12,27 @@ import java.util.List;
 
 @Service
 public class Connect4Service {
-    static List<Connect4Game> gameList;
-    public List<String> findOrCreateGame(String playerName) {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    static List<Connect4Game> gameList = new ArrayList<>();
+    public List<String> findOrCreateGame(String playerId) {
         List<String> gameAttributeList = new ArrayList<>();
-        gameAttributeList.add(gameList.getLast().getGameId());
         if(gameList.isEmpty() || gameList.getLast().getPlayer2() == null) {
-            gameList.add(new Connect4Game(playerName, gameList.size()+1));
+            gameList.add(new Connect4Game(playerId, gameList.size()+1));
+            gameAttributeList.add(gameList.getLast().getGameId());
             gameAttributeList.add("p1");
             return gameAttributeList;
         }
-        gameList.getLast().setPlayer2(playerName);
+        Connect4Game game = gameList.getLast();
+        game.setPlayer2(playerId);
+
+        gameAttributeList.add(game.getGameId());
         gameAttributeList.add("p2");
+
+        String destination = "/game_backend/" + game.getGameId();
+        messagingTemplate.convertAndSend(destination, game.getGameState());
+        gameAttributeList.add(String.valueOf(game.getGameState().getTurn()));
         return gameAttributeList;
     }
 
