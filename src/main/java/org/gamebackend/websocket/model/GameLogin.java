@@ -13,6 +13,7 @@ public class GameLogin {
     private String gameType;
     private String gameId;
     private String playerId;
+    private String turn;
     private String errorMessage;
 }
 

@@ -2,6 +2,7 @@ package org.gamebackend.websocket.controler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gamebackend.connect4.service.Connect4Service;
+import org.gamebackend.login.model.UserModel;
 import org.gamebackend.login.service.TokenService;
 import org.gamebackend.websocket.model.GameLogin;
 import org.gamebackend.websocket.model.GameMove;
@@ -29,7 +30,23 @@ public class GameWebSocketController {
     @MessageMapping("/join")
     @SendTo("/game_backend/join")
     public GameLogin handleJoin(GameLogin login) {
-        log.info("in handleMove login: {}", login);
+        log.debug("in handleMove login: {}", login);
+        /*
+        if(login.getToken().isEmpty()) {
+            try {
+                UserModel user = new UserModel();
+                user.setName(login.getUserName());
+                user.setPassword(login.getPassword(), "login");
+                login.setToken(tokenService.provideToken(user));
+            } catch (Exception e) {
+                log.warn("login failed for user {} with exception {}",
+                        login.getUserName(), e.getMessage());
+                login.setErrorMessage(e.toString());
+                return login;
+            }
+
+        }*/
+
         String validation = tokenService.validateToken(login.getPlayerId());
         if(!validation.equals("validated")) {
             login.setErrorMessage(validation);
@@ -38,6 +55,7 @@ public class GameWebSocketController {
         List<String> creationStatus = connect4Service.findOrCreateGame(login.getPlayerId());
         login.setGameId(creationStatus.get(0));
         login.setPlayerId(creationStatus.get(1));
+        login.setTurn(creationStatus.get(2));
         return login;
     }
 

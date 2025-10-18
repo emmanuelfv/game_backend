@@ -12,7 +12,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/game_backend");  // Para mensajes del servidor
-        config.setApplicationDestinationPrefixes("/connect4");  // Para mensajes del cliente
+        config.setApplicationDestinationPrefixes("/game_frontend");  // Para mensajes del cliente
     }
 
     @Override
