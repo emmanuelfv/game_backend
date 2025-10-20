@@ -19,9 +19,18 @@ public class Connect4Service {
     public List<String> findOrCreateGame(String userName) {
         List<String> gameAttributeList = new ArrayList<>();
         if(gameList.isEmpty() || gameList.getLast().getPlayer2() == null) {
-            gameList.add(new Connect4Game(userName, gameList.size()+1));
+            Connect4Game game = new Connect4Game();
+            gameList.add(game);
+            game.setGameId(gameList.size());
+            game.setPlayer1(userName);
+
             gameAttributeList.add(gameList.getLast().getGameId());
             gameAttributeList.add("p1");
+
+            //TODO: remove this
+            game.setPlayer2(userName + "_bot");
+            gameAttributeList.add(String.valueOf(game.getGameState().getTurn()));
+
             return gameAttributeList;
         }
         Connect4Game game = gameList.getLast();

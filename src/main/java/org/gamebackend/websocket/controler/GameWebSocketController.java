@@ -8,6 +8,7 @@ import org.gamebackend.websocket.model.GameLogin;
 import org.gamebackend.websocket.model.GameMove;
 import org.gamebackend.websocket.model.GameState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -31,23 +32,8 @@ public class GameWebSocketController {
     @SendTo("/game_backend/join")
     public GameLogin handleJoin(GameLogin login) {
         log.info("in handleMove login: {}", login);
-        /*
-        if(login.getToken().isEmpty()) {
-            try {
-                UserModel user = new UserModel();
-                user.setName(login.getUserName());
-                user.setPassword(login.getPassword(), "login");
-                login.setToken(tokenService.provideToken(user));
-            } catch (Exception e) {
-                log.warn("login failed for user {} with exception {}",
-                        login.getUserName(), e.getMessage());
-                login.setErrorMessage(e.toString());
-                return login;
-            }
 
-        }*/
-
-        String validation = tokenService.validateToken(login.getUserName());
+        String validation = tokenService.validateToken(login.getToken());
         if(!validation.equals("validated")) {
             login.setErrorMessage(validation);
             return login;
@@ -55,26 +41,15 @@ public class GameWebSocketController {
         List<String> creationStatus = connect4Service.findOrCreateGame(login.getUserName());
         login.setGameId(creationStatus.get(0));
         login.setPlayerId(creationStatus.get(1));
-        login.setTurn(creationStatus.get(2));
+        if (creationStatus.size() > 2) login.setTurn(creationStatus.get(2));
         log.info("login: {}", login);
         return login;
     }
 
-    @MessageMapping("/move")
+    @MessageMapping("/move/{gameId}")
     @SendTo("/game_backend/{gameId}")
-    public GameState handleMove(GameMove move) {
-        log.info("in handleMove move: {}", move);
-
-        GameState gs = connect4Service.addMove(move);
-        log.info("GameState: {}", gs);
-        return gs;
+    public GameState handleMove(@DestinationVariable String gameId, GameMove move) {
+        return connect4Service.addMove(move);
     }
 
-    /*
-    @MessageMapping("/move")
-    @SendTo("/game_backend/move")
-    public GameState handleMove(GameState gameStatus) {
-        log.info("in handleMove gameStatus: {}", gameStatus);
-        return new GameState(gameStatus.getMessage() + "+1");
-    }*/
 }
