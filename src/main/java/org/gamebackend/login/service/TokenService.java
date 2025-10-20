@@ -37,13 +37,14 @@ public class TokenService {
         }
 
         UserModel userToSave = userFound.get();
+
         String validateResult = this.validateToken(userToSave.getLastToken());
 
         TokenModel token = new TokenModel();
         if (validateResult.equals("validated")) {
             Optional<TokenModel> tokenWrapper = tokenRepository.findByToken(userToSave.getLastToken());
             token = tokenWrapper.get();
-        } else if (validateResult.equals("expired")) {
+        } else {
             LocalDateTime time = LocalDateTime.now();
             token.setToken();
             token.setCreationdate(time);
@@ -55,15 +56,18 @@ public class TokenService {
         return token.getToken();
     }
 
-    @SneakyThrows
     public String validateToken(String token_str){
+        if (token_str == null || token_str.isEmpty()) {
+            return "not found";
+        }
+
         TokenModel token = new TokenModel();
         LocalDateTime time = LocalDateTime.now();
         log.info("time:\n{}", time);
         log.info("System expiration time [minutes]:\n{}", expirationMinutes);
         token.setToken(token_str);
         token.setCreationdate(time);
-        token.setUpdatedate(time.minusMinutes(expirationMinutes));
+        token.setUpdatedate(time);
         Optional<TokenModel> tokenFound = tokenRepository
                 .findByTokenAndUpdatedateGreaterThan(
                         token.getToken(),

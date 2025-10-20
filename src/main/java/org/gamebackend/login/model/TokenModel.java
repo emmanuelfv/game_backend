@@ -48,7 +48,7 @@ public class TokenModel {
         }
     }
 
-    public void setToken(@NonNull String token) throws Exception{
+    public void setToken(String token){
         this.token = token;
     }
 }

@@ -16,16 +16,16 @@ public class Connect4Service {
     private SimpMessagingTemplate messagingTemplate;
 
     static List<Connect4Game> gameList = new ArrayList<>();
-    public List<String> findOrCreateGame(String playerId) {
+    public List<String> findOrCreateGame(String userName) {
         List<String> gameAttributeList = new ArrayList<>();
         if(gameList.isEmpty() || gameList.getLast().getPlayer2() == null) {
-            gameList.add(new Connect4Game(playerId, gameList.size()+1));
+            gameList.add(new Connect4Game(userName, gameList.size()+1));
             gameAttributeList.add(gameList.getLast().getGameId());
             gameAttributeList.add("p1");
             return gameAttributeList;
         }
         Connect4Game game = gameList.getLast();
-        game.setPlayer2(playerId);
+        game.setPlayer2(userName);
 
         gameAttributeList.add(game.getGameId());
         gameAttributeList.add("p2");

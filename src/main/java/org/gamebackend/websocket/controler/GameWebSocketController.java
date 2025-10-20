@@ -30,7 +30,7 @@ public class GameWebSocketController {
     @MessageMapping("/join")
     @SendTo("/game_backend/join")
     public GameLogin handleJoin(GameLogin login) {
-        log.debug("in handleMove login: {}", login);
+        log.info("in handleMove login: {}", login);
         /*
         if(login.getToken().isEmpty()) {
             try {
@@ -47,15 +47,16 @@ public class GameWebSocketController {
 
         }*/
 
-        String validation = tokenService.validateToken(login.getPlayerId());
+        String validation = tokenService.validateToken(login.getUserName());
         if(!validation.equals("validated")) {
             login.setErrorMessage(validation);
             return login;
         }
-        List<String> creationStatus = connect4Service.findOrCreateGame(login.getPlayerId());
+        List<String> creationStatus = connect4Service.findOrCreateGame(login.getUserName());
         login.setGameId(creationStatus.get(0));
         login.setPlayerId(creationStatus.get(1));
         login.setTurn(creationStatus.get(2));
+        log.info("login: {}", login);
         return login;
     }
 
@@ -64,7 +65,9 @@ public class GameWebSocketController {
     public GameState handleMove(GameMove move) {
         log.info("in handleMove move: {}", move);
 
-        return connect4Service.addMove(move);
+        GameState gs = connect4Service.addMove(move);
+        log.info("GameState: {}", gs);
+        return gs;
     }
 
     /*

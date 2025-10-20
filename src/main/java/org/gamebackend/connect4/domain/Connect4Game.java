@@ -33,14 +33,14 @@ public class Connect4Game {
         return EMPTY_SLOT;
     }
 
-    public Connect4Game(String playerToken1, int gameInt) {
-        this.player1 = playerToken1;
+    public Connect4Game(String userName, int gameInt) {
+        this.player1 = userName;
         this.gameId = "connect4_" + new DecimalFormat("0000").format(gameInt);
         this.endGame = EMPTY_SLOT;
     }
 
-    public void setPlayer2(String playerToken2) {
-        this.player2 = playerToken2;
+    public void setPlayer2(String userName) {
+        this.player2 = userName;
         this.matchStart();
     }
 
