@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -38,10 +39,10 @@ public class GameWebSocketController {
             login.setErrorMessage(validation);
             return login;
         }
-        List<String> creationStatus = connect4Service.findOrCreateGame(login.getUserName());
-        login.setGameId(creationStatus.get(0));
-        login.setPlayerId(creationStatus.get(1));
-        if (creationStatus.size() > 2) login.setTurn(creationStatus.get(2));
+        Map<String,String> creationStatus = connect4Service.findOrCreateGame(login.getUserName(), login.getGameType());
+        login.setGameId(creationStatus.get("gameId"));
+        login.setPlayerId(creationStatus.get("playerId"));
+        if (creationStatus.size() > 2) login.setTurn(creationStatus.get("turn"));
         log.info("login: {}", login);
         return login;
     }
